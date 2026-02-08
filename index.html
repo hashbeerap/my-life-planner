@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life Planner - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #0d7377;
+            --light-green: #14a085;
+            --gold: #d4af37;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f8f9fa;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d7377 0%, #14a085 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: ltr;
+        }
+
+        body.rtl {
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+            color: var(--white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .lang-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        body.rtl .lang-selector {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid var(--white);
+            color: var(--white);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--white);
+            color: var(--primary-green);
+        }
+
+        nav {
+            background: var(--light-bg);
+            padding: 0;
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 3px solid var(--primary-green);
+        }
+
+        nav button {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav button:hover {
+            background: rgba(13, 115, 119, 0.1);
+        }
+
+        nav button.active {
+            background: var(--white);
+            color: var(--primary-green);
+            border-bottom-color: var(--gold);
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px var(--shadow);
+            border-left: 5px solid var(--primary-green);
+        }
+
+        .card h2 {
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .card h3 {
+            color: var(--light-green);
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        .counter-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: var(--white);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .counter-display h1 {
+            font-size: 4em;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .counter-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--light-green);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--gold);
+            color: var(--dark-bg);
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: var(--white);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--light-green));
+            border-radius: 15px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tracker-item {
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .tracker-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .tracker-item input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            font-size: 2.5em;
+            margin: 10px 0;
+            color: var(--white);
+        }
+
+        .stat-box p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .month-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .month-card {
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .month-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .month-card.active {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+
+        .action-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .action-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--light-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .action-list li:before {
+            content: "✓ ";
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-bg);
+            color: var(--text-dark);
+            margin-top: 30px;
+        }
+
+        .export-import {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .lang-selector {
+                position: static;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav button {
+                min-width: auto;
+            }
+
+            .counter-display h1 {
+                font-size: 2.5em;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+        }
+
+        .bismillah {
+            text-align: center;
+            font-size: 1.8em;
+            color: var(--primary-green);
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="lang-selector">
+                <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
+                <button class="lang-btn" onclick="setLanguage('ml')">മലയാളം</button>
+            </div>
+            <h1 id="headerTitle">My Life Planner - AI Assistant</h1>
+            <p id="headerSubtitle">Plan your Islamic life with purpose and track your spiritual journey</p>
+        </header>
+
+        <nav>
+            <button class="active" onclick="showPage('home')" id="navHome">Home</button>
+            <button onclick="showPage('quran')" id="navQuran">Quran</button>
+            <button onclick="showPage('salawat')" id="navSalawat">Salawat</button>
+            <button onclick="showPage('prayer')" id="navPrayer">Prayer</button>
+            <button onclick="showPage('calendar')" id="navCalendar">Calendar</button>
+            <button onclick="showPage('settings')" id="navSettings">Settings</button>
+        </nav>
+
+        <div class="content">
+            <!-- HOME PAGE -->
+            <div id="home" class="page active">
+                <div class="bismillah" id="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                
+                <div class="card">
+                    <h2 id="welcomeTitle">Welcome to My Life Planner</h2>
+                    <p id="welcomeText">This planner helps you organize your Islamic life across all 12 Hijri months. Track your prayers, Quran reading, salawat, and achieve your spiritual goals.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3 id="todayPrayersCount">0/5</h3>
+                        <p id="todayPrayersLabel">Today's Prayers</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3 id="todayQuranCount">0</h3>
+                        <p id="todayQuranLabel">Pages Read Today</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3 id="todaySalawatCount">0</h3>
+                        <p id="todaySalawatLabel">Salawat Today</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 id="quickActionsTitle">Quick Actions</h2>
+                    <div class="counter-controls">
+                        <button class="btn btn-primary" onclick="showPage('prayer')" id="btnLogPrayer">Log Prayer</button>
+                        <button class="btn btn-primary" onclick="showPage('quran')" id="btnReadQuran">Read Quran</button>
+                        <button class="btn btn-primary" onclick="showPage('salawat')" id="btnCountSalawat">Count Salawat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QURAN TRACKER -->
+            <div id="quran" class="page">
+                <div class="card">
+                    <h2 id="quranTitle">Quran Tracker</h2>
+                    
+                    <div class="input-group">
+                        <label id="quranGoalLabel">Set Your Goal:</label>
+                        <select id="quranGoal" onchange="saveQuranGoal()">
+                            <option value="30">1 Khatm (30 Juz)</option>
+                            <option value="60">2 Khatm (60 Juz)</option>
+                            <option value="90">3 Khatm (90 Juz)</option>
+                            <option value="604">Complete Quran by Pages (604)</option>
+                        </select>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quranProgress">0%</div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <h3 id="quranCompleted">0</h3>
+                            <p id="quranCompletedLabel">Completed</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3 id="quranRemaining">30</h3>
+                            <p id="quranRemainingLabel">Remaining</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label id="addProgressLabel">Add Today's Progress:</label>
+                        <input type="number" id="quranInput" min="1" placeholder="Enter Juz or Pages">
+                        <button class="btn btn-primary" onclick="addQuranProgress()" id="btnAddQuran" style="margin-top: 10px;">Add Progress</button>
+                    </div>
+
+                    <div class="counter-controls">
+                        <button class="btn btn-secondary" onclick="resetQuran()" id="btnResetQuran">Reset Progress</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SALAWAT COUNTER -->
+            <div id="salawat" class="page">
+                <div class="card">
+                    <h2 id="salawatTitle">Salawat Counter</h2>
+                    <p id="salawatDesc" style="text-align: center; margin: 15px 0;">صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ</p>
+                    
+                    <div class="counter-display">
+                        <p id="salawatTodayLabel">Today's Count</p>
+                        <h1 id="salawatToday">0</h1>
+                    </div>
+
+                    <div class="counter-controls">
+                        <button class="btn btn-primary" onclick="addSalawat(1)" id="btnAdd1">+1</button>
+                        <button class="btn btn-primary" onclick="addSalawat(10)" id="btnAdd10">+10</button>
+                        <button class="btn btn-primary" onclick="addSalawat(100)" id="btnAdd100">+100</button>
+                        <button class="btn btn-primary" onclick="addSalawat(1000)" id="btnAdd1000">+1000</button>
+                    </div>
+
+                    <div class="stats-grid" style="margin-top: 30px;">
+                        <div class="stat-box">
+                            <h3 id="salawatWeek">0</h3>
+                            <p id="salawatWeekLabel">This Week</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3 id="salawatMonth">0</h3>
+                            <p id="salawatMonthLabel">This Month</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3 id="salawatTotal">0</h3>
+                            <p id="salawatTotalLabel">Total Lifetime</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 30px;">
+                        <label id="salawatGoalLabel">Daily Goal:</label>
+                        <input type="number" id="salawatGoalInput" value="7000" min="1">
+                        <button class="btn btn-secondary" onclick="setSalawatGoal()" id="btnSetGoal" style="margin-top: 10px;">Set Goal</button>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="salawatProgress">0%</div>
+                    </div>
+
+                    <div class="counter-controls" style="margin-top: 20px;">
+                        <button class="btn btn-danger" onclick="resetSalawatToday()" id="btnResetToday">Reset Today</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRAYER TRACKER -->
+            <div id="prayer" class="page">
+                <div class="card">
+                    <h2 id="prayerTitle">Prayer Tracker</h2>
+                    
+                    <div class="tracker-grid">
+                        <div class="tracker-item">
+                            <h3 id="fajrLabel">Fajr</h3>
+                            <input type="checkbox" id="prayerFajr" onchange="savePrayers()">
+                            <p id="fajrTime">صلاة الفجر</p>
+                        </div>
+                        <div class="tracker-item">
+                            <h3 id="dhuhrLabel">Dhuhr</h3>
+                            <input type="checkbox" id="prayerDhuhr" onchange="savePrayers()">
+                            <p id="dhuhrTime">صلاة الظهر</p>
+                        </div>
+                        <div class="tracker-item">
+                            <h3 id="asrLabel">Asr</h3>
+                            <input type="checkbox" id="prayerAsr" onchange="savePrayers()">
+                            <p id="asrTime">صلاة العصر</p>
+                        </div>
+                        <div class="tracker-item">
+                            <h3 id="maghribLabel">Maghrib</h3>
+                            <input type="checkbox" id="prayerMaghrib" onchange="savePrayers()">
+                            <p id="maghribTime">صلاة المغرب</p>
+                        </div>
+                        <div class="tracker-item">
+                            <h3 id="ishaLabel">Isha</h3>
+                            <input type="checkbox" id="prayerIsha" onchange="savePrayers()">
+                            <p id="ishaTime">صلاة العشاء</p>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="prayerProgress">0%</div>
+                    </div>
+
+                    <div class="stats-grid" style="margin-top: 30px;">
+                        <div class="stat-box">
+                            <h3 id="prayerStreak">0</h3>
+                            <p id="prayerStreakLabel">Day Streak</p>
+                        </div>
+                        <div class="stat-box">
+                            <h3 id="prayerWeekCount">0/35</h3>
+                            <p id="prayerWeekLabel">This Week</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ISLAMIC CALENDAR -->
+            <div id="calendar" class="page">
+                <div class="card">
+                    <h2 id="calendarTitle">Islamic Calendar - Monthly Plans</h2>
+                    
+                    <div class="month-selector">
+                        <div class="month-card" onclick="showMonthPlan('muharram')">
+                            <h3 id="month1">Muharram</h3>
+                            <p>المحرم</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('safar')">
+                            <h3 id="month2">Safar</h3>
+                            <p>صفر</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('rabiawwal')">
+                            <h3 id="month3">Rabi al-Awwal</h3>
+                            <p>ربيع الأول</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('rabithani')">
+                            <h3 id="month4">Rabi al-Thani</h3>
+                            <p>ربيع الثاني</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('jumadaawwal')">
+                            <h3 id="month5">Jumada al-Awwal</h3>
+                            <p>جمادى الأولى</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('jumadathani')">
+                            <h3 id="month6">Jumada al-Thani</h3>
+                            <p>جمادى الثانية</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('rajab')">
+                            <h3 id="month7">Rajab</h3>
+                            <p>رجب</p>
+                        </div>
+                        <div class="month-card active" onclick="showMonthPlan('shaban')">
+                            <h3 id="month8">Sha'ban</h3>
+                            <p>شعبان</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('ramadan')">
+                            <h3 id="month9">Ramadan</h3>
+                            <p>رمضان</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('shawwal')">
+                            <h3 id="month10">Shawwal</h3>
+                            <p>شوال</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('dhulqadah')">
+                            <h3 id="month11">Dhul Qadah</h3>
+                            <p>ذو القعدة</p>
+                        </div>
+                        <div class="month-card" onclick="showMonthPlan('dhulhijjah')">
+                            <h3 id="month12">Dhul Hijjah</h3>
+                            <p>ذو الحجة</p>
+                        </div>
+                    </div>
+
+                    <div id="monthPlanContent" class="card" style="margin-top: 20px;">
+                        <!-- Month plan content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div id="settings" class="page">
+                <div class="card">
+                    <h2 id="settingsTitle">Settings & Backup</h2>
+                    
+                    <h3 id="backupTitle">Backup Your Data</h3>
+                    <p id="backupDesc">Export all your progress to keep it safe. You can restore it anytime on any device.</p>
+                    
+                    <div class="export-import">
+                        <button class="btn btn-primary" onclick="exportData()" id="btnExport">📥 Export Backup</button>
+                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" id="btnImport">📤 Import Backup</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    </div>
+
+                    <h3 id="dangerZoneTitle" style="color: #e74c3c; margin-top: 40px;">Danger Zone</h3>
+                    <p id="dangerZoneDesc">Warning: This will delete all your data permanently!</p>
+                    <button class="btn btn-danger" onclick="resetAllData()" id="btnResetAll">Reset All Data</button>
+                </div>
+
+                <div class="card">
+                    <h2 id="aboutTitle">About</h2>
+                    <p id="aboutText">My Life Planner - AI Assistant is a free tool to help Muslims organize their spiritual life. May Allah accept all our good deeds. Ameen.</p>
+                    <p style="margin-top: 15px; text-align: center; color: var(--primary-green); font-weight: bold;">
+                        <span id="sadaqahText">Built as Sadaqah Jariyah for the Ummah</span> 💚
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p id="footerText">May Allah accept your efforts and make this a means of guidance. Ameen 🤲</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="translations.js"></script>
+</body>
+</html>
