@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d7377">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="My Life Planner">
+    <meta name="description" content="Islamic Life Planner - Track prayers, Quran, Salawat across all 12 Hijri months">
+    <link rel="manifest" href="manifest.json">
     <title>My Life Planner - AI Assistant</title>
     <style>
         * {
@@ -44,45 +50,55 @@
             overflow: hidden;
         }
 
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+
         header {
             background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
             color: var(--white);
-            padding: 30px;
+            padding: 25px 20px 20px 20px;
             text-align: center;
+            position: relative;
         }
 
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.6em;
+            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         header p {
-            font-size: 1.1em;
+            font-size: 0.9em;
             opacity: 0.95;
         }
 
         .lang-selector {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             display: flex;
-            gap: 10px;
+            gap: 6px;
         }
 
         body.rtl .lang-selector {
             right: auto;
-            left: 20px;
+            left: 15px;
         }
 
         .lang-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: rgba(255,255,255,0.2);
-            border: 2px solid var(--white);
+            border: 1.5px solid var(--white);
             color: var(--white);
-            border-radius: 20px;
+            border-radius: 15px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.75em;
             transition: all 0.3s;
         }
 
@@ -92,45 +108,58 @@
         }
 
         nav {
-            background: var(--light-bg);
-            padding: 0;
+            background: var(--white);
+            padding: 8px 0;
             display: flex;
-            overflow-x: auto;
-            border-bottom: 3px solid var(--primary-green);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 20px rgba(0,0,0,0.15);
+            border-top: 1px solid #e0e0e0;
+            justify-content: space-around;
         }
 
         nav button {
             flex: 1;
-            min-width: 150px;
-            padding: 20px;
+            padding: 8px 5px;
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            color: var(--text-dark);
+            font-size: 0.7em;
+            font-weight: 500;
+            color: #757575;
             transition: all 0.3s;
-            border-bottom: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-radius: 12px;
+            margin: 0 4px;
+        }
+
+        nav button .nav-icon {
+            font-size: 1.8em;
+            transition: all 0.3s;
         }
 
         nav button:hover {
-            background: rgba(13, 115, 119, 0.1);
+            background: rgba(13, 115, 119, 0.05);
         }
 
         nav button.active {
-            background: var(--white);
             color: var(--primary-green);
-            border-bottom-color: var(--gold);
+            font-weight: 600;
+        }
+
+        nav button.active .nav-icon {
+            transform: scale(1.1);
         }
 
         .content {
-            padding: 30px;
-            min-height: 500px;
-            padding-top: 20px;
+            padding: 20px 20px 80px 20px;
+            min-height: calc(100vh - 300px);
         }
 
         .page {
@@ -149,23 +178,23 @@
 
         .card {
             background: var(--white);
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px var(--shadow);
-            border-left: 5px solid var(--primary-green);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .card h2 {
             color: var(--primary-green);
             margin-bottom: 15px;
-            font-size: 1.8em;
+            font-size: 1.6em;
         }
 
         .card h3 {
             color: var(--light-green);
             margin: 20px 0 10px 0;
-            font-size: 1.3em;
+            font-size: 1.2em;
         }
 
         .counter-display {
@@ -192,25 +221,29 @@
         }
 
         .btn {
-            padding: 15px 30px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: bold;
+            border-radius: 30px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 10px var(--shadow);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            letter-spacing: 0.3px;
         }
 
         .btn-primary {
-            background: var(--primary-green);
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
             color: var(--white);
         }
 
         .btn-primary:hover {
-            background: var(--light-green);
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px var(--shadow);
+            box-shadow: 0 6px 20px rgba(13, 115, 119, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -393,21 +426,30 @@
 
         @media (max-width: 768px) {
             header h1 {
-                font-size: 1.8em;
+                font-size: 1.4em;
+            }
+
+            header p {
+                font-size: 0.85em;
             }
 
             .lang-selector {
                 position: static;
                 justify-content: center;
-                margin-bottom: 15px;
+                margin-top: 12px;
             }
 
             nav {
-                flex-direction: column;
+                padding: 10px 0;
             }
 
             nav button {
-                min-width: auto;
+                font-size: 0.65em;
+                padding: 6px 2px;
+            }
+
+            nav button .nav-icon {
+                font-size: 1.6em;
             }
 
             .counter-display h1 {
@@ -420,8 +462,7 @@
             }
 
             .content {
-                padding: 15px;
-                padding-top: 10px;
+                padding: 15px 15px 90px 15px;
             }
 
             .card {
@@ -429,11 +470,17 @@
             }
 
             body {
-                padding: 10px;
+                padding: 0;
             }
 
             .container {
-                border-radius: 15px;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .back-to-top {
+                bottom: 90px;
+                right: 20px;
             }
         }
 
@@ -447,8 +494,8 @@
 
         .back-to-top {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 90px;
+            right: 20px;
             background: var(--primary-green);
             color: var(--white);
             width: 50px;
@@ -457,17 +504,18 @@
             border: none;
             cursor: pointer;
             font-size: 1.5em;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(13, 115, 119, 0.4);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 999;
             transition: all 0.3s;
         }
 
         .back-to-top:hover {
             background: var(--light-green);
             transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(13, 115, 119, 0.5);
         }
 
         .back-to-top.show {
@@ -476,7 +524,7 @@
 
         body.rtl .back-to-top {
             right: auto;
-            left: 30px;
+            left: 20px;
         }
     </style>
 </head>
@@ -493,12 +541,30 @@
         </header>
 
         <nav>
-            <button class="active" onclick="showPage('home')" id="navHome">Home</button>
-            <button onclick="showPage('quran')" id="navQuran">Quran</button>
-            <button onclick="showPage('salawat')" id="navSalawat">Salawat</button>
-            <button onclick="showPage('prayer')" id="navPrayer">Prayer</button>
-            <button onclick="showPage('calendar')" id="navCalendar">Calendar</button>
-            <button onclick="showPage('settings')" id="navSettings">Settings</button>
+            <button class="active" onclick="showPage('home')" id="navHome">
+                <span class="nav-icon">🏠</span>
+                <span>Home</span>
+            </button>
+            <button onclick="showPage('quran')" id="navQuran">
+                <span class="nav-icon">📖</span>
+                <span>Quran</span>
+            </button>
+            <button onclick="showPage('salawat')" id="navSalawat">
+                <span class="nav-icon">📿</span>
+                <span>Salawat</span>
+            </button>
+            <button onclick="showPage('prayer')" id="navPrayer">
+                <span class="nav-icon">🕌</span>
+                <span>Prayer</span>
+            </button>
+            <button onclick="showPage('calendar')" id="navCalendar">
+                <span class="nav-icon">📅</span>
+                <span>Calendar</span>
+            </button>
+            <button onclick="showPage('settings')" id="navSettings">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </button>
         </nav>
 
         <div class="content">

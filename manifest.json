@@ -1,0 +1,27 @@
+{
+  "name": "My Life Planner - AI Assistant",
+  "short_name": "Life Planner",
+  "description": "Islamic Life Planner for tracking prayers, Quran, and Salawat across all 12 Hijri months",
+  "start_url": "/my-life-planner/",
+  "display": "standalone",
+  "background_color": "#0d7377",
+  "theme_color": "#0d7377",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity", "religion"],
+  "lang": "en",
+  "dir": "ltr"
+}
