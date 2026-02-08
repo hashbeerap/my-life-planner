@@ -251,6 +251,12 @@ function showPage(pageId) {
     navButtons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
+    // Scroll to top of content smoothly
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+    
     // Update displays when switching pages
     if (pageId === 'home') updateHomeStats();
     if (pageId === 'salawat') updateSalawatDisplay();
@@ -280,6 +286,9 @@ function showMonthPlan(month) {
         <h3>Recommended Actions:</h3>
         <p>${plans[month].recommendations}</p>
     `;
+    
+    // Scroll to the month plan content smoothly
+    content.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function getMonthPlans() {
@@ -481,7 +490,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show default month plan (Sha'ban - current month)
     showMonthPlan('shaban');
+    
+    // Back to top button functionality
+    const backToTopBtn = document.getElementById('backToTop');
+    
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
 });
+
+// Scroll to top function
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
 
 // Auto-save every minute
 setInterval(saveData, 60000);
